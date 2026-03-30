@@ -16,11 +16,19 @@ class HouseholdController extends Controller
 
     public function create()
     {
+        // Check if user can add households
+        if (!auth()->user()->hasPermission('add_households') && !auth()->user()->isSuperAdmin()) {
+            abort(403, 'Unauthorized to create households.');
+        }
         return view('households.create');
     }
 
     public function store(Request $request)
     {
+        if (!auth()->user()->hasPermission('add_households') && !auth()->user()->isSuperAdmin()) {
+            abort(403, 'Unauthorized to create households.');
+        }
+
         $request->validate([
             'household_id' => 'required|unique:households',
             'address' => 'required',
@@ -55,12 +63,20 @@ class HouseholdController extends Controller
 
     public function edit(Household $household)
     {
+        // Check if user can update households
+        if (!auth()->user()->hasPermission('update_households') && !auth()->user()->isSuperAdmin()) {
+            abort(403, 'Unauthorized to update households.');
+        }
         $household->load('members');
         return view('households.edit', compact('household'));
     }
 
     public function update(Request $request, Household $household)
     {
+        if (!auth()->user()->hasPermission('update_households') && !auth()->user()->isSuperAdmin()) {
+            abort(403, 'Unauthorized to update households.');
+        }
+
         $request->validate([
             'household_id' => 'required|unique:households,household_id,' . $household->id,
             'address' => 'required',
@@ -74,6 +90,7 @@ class HouseholdController extends Controller
         ]);
 
         $household->update($request->only(['household_id', 'address', 'purok', 'emergency_contact']));
+
 
         $household->members()->delete(); // Delete existing members
 
@@ -90,6 +107,11 @@ class HouseholdController extends Controller
 
     public function destroy(Household $household)
     {
+        // Encoders cannot delete households
+        if (auth()->user()->hasRole('Encoder') && !auth()->user()->isSuperAdmin()) {
+            return back()->with('error', 'You do not have permission to delete households.');
+        }
+
         $household->delete();
         $this->updateAnalytics();
         return redirect()->route('households.index')->with('success', 'Household deleted successfully.');
