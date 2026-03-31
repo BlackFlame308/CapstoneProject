@@ -22,7 +22,6 @@ class RoleSeeder extends Seeder
             ['name' => 'manage_responders', 'description' => 'Can manage responders'],
             ['name' => 'manage_evacuation_officers', 'description' => 'Can manage evacuation officers'],
             ['name' => 'view_analytics', 'description' => 'Can view analytics'],
-            ['name' => 'create_disaster_events', 'description' => 'Can create disaster events'],
         ];
 
         foreach ($permissions as $permission) {

@@ -123,9 +123,7 @@
                         <a href="{{ route('responders.index') }}" class="nav-link">
                             <i class="bi bi-people"></i> Responders
                         </a>
-                        <a href="{{ route('disaster_events.index') }}" class="nav-link">
-                            <i class="bi bi-exclamation-triangle"></i> Disaster Events
-                        </a>
+                       
                         <a href="{{ route('analytics.index') }}" class="nav-link">
                             <i class="bi bi-graph-up"></i> Analytics
                         </a>
@@ -190,13 +188,38 @@
                                 <div class="label">Responders</div>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="card dashboard-card">
-                                <div class="number">{{ \App\Models\DisasterEvent::count() }}</div>
-                                <div class="label">Disaster Events</div>
+                    </div>
+
+                    <!-- Account Creation Section -->
+                    @if(auth()->user()->isSuperAdmin())
+                        <div class="card mt-4">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="bi bi-person-plus"></i> Create New Accounts</h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-muted">Manage user accounts for responders, evacuation officers, and household members.</p>
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <a href="{{ route('users.create') }}" class="btn btn-primary w-100">
+                                            <i class="bi bi-person-badge"></i> Create Responder Account
+                                        </a>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <a href="{{ route('users.create') }}" class="btn btn-primary w-100">
+                                            <i class="bi bi-shield-check"></i> Create Evacuation Officer
+                                        </a>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <a href="{{ route('users.create') }}" class="btn btn-primary w-100">
+                                            <i class="bi bi-house-door"></i> Create Household Account
+                                        </a>
+                                    </div>
+                                </div>
+                                <hr class="my-3">
+                                <p class="text-muted small mb-0"><strong>Note:</strong> Set a temporary password for the user. They can change it after logging in.</p>
                             </div>
                         </div>
-                    </div>
+                    @endif
 
                     @if(auth()->user()->isSuperAdmin())
                         <div class="row mt-4">
