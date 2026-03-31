@@ -16,4 +16,9 @@ class EvacuationOfficer extends Model
         'assigned_area',
         'address',
     ];
+
+    public function scopeByArea($query, $area)
+    {
+        return $query->where('assigned_area', $area);
+    }
 }

@@ -5,23 +5,22 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class DisasterEvent extends Model
+class Report extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'name',
-        'disaster_type',
-        'date',
-        'description',
+        'type',
+        'content',
+        'disaster_event_id',
     ];
 
     protected $casts = [
-        'date' => 'date',
+        'content' => 'array',
     ];
 
-    public function reports()
+    public function disasterEvent()
     {
-        return $this->hasMany(Report::class);
+        return $this->belongsTo(DisasterEvent::class);
     }
 }
