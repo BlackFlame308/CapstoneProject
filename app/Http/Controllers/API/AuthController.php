@@ -29,13 +29,43 @@ class AuthController extends Controller
             ], 422);
         }
 
-        $role = Role::firstWhere('name', $request->input('role'));
+        $roleLookup = [
+            'Captain' => 'Captain',
+            'Encoder' => 'Encoder',
+            'Responder' => 'Responder',
+            'Evacuation Officer' => 'Evacuation Officer',
+        ];
+
+        $requestedRole = $request->input('role');
+        $role = Role::firstWhere('name', $roleLookup[$requestedRole] ?? '');
 
         if (!$role) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Role not found',
             ], 404);
+        }
+
+        $currentUser = auth()->user();
+
+        // Only Captain can create non-Captain users.
+        if ($requestedRole !== 'Captain') {
+            if (!$currentUser || !$currentUser->isSuperAdmin()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Forbidden: only Captain can register users with this role.',
+                ], 403);
+            }
+        }
+
+        // Only the first user or Captain can create Captain.
+        if ($requestedRole === 'Captain') {
+            if (User::count() > 0 && (!$currentUser || !$currentUser->isSuperAdmin())) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Forbidden: only existing Captain can create another Captain.',
+                ], 403);
+            }
         }
 
         $user = User::create([

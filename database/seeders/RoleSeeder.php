@@ -30,9 +30,9 @@ class RoleSeeder extends Seeder
         }
 
         // Create Roles
-        $superAdminRole = Role::firstOrCreate(
-            ['name' => 'Super Admin'],
-            ['description' => 'Full system access - Barangay Captain', 'guard_name' => 'web']
+        $captainRole = Role::firstOrCreate(
+            ['name' => 'Captain'],
+            ['description' => 'Barangay Captain - super admin privileges', 'guard_name' => 'web']
         );
 
         $encoderRole = Role::firstOrCreate(
@@ -40,14 +40,31 @@ class RoleSeeder extends Seeder
             ['description' => 'Can manage households and users', 'guard_name' => 'web']
         );
 
+        $responderRole = Role::firstOrCreate(
+            ['name' => 'Responder'],
+            ['description' => 'Disaster responder role', 'guard_name' => 'web']
+        );
+
+        $evacuationOfficerRole = Role::firstOrCreate(
+            ['name' => 'Evacuation Officer'],
+            ['description' => 'Evacuation officer role', 'guard_name' => 'web']
+        );
+
         $viewerRole = Role::firstOrCreate(
             ['name' => 'Viewer'],
             ['description' => 'Can only view data', 'guard_name' => 'web']
         );
 
+        // Super admin alias support for old roles
+        $superAdminRole = Role::firstOrCreate(
+            ['name' => 'Super Admin'],
+            ['description' => 'Legacy Super Admin alias', 'guard_name' => 'web']
+        );
+
         // Assign permissions to roles
         $allPermissions = Permission::all();
-        $superAdminRole->permissions()->sync($allPermissions->pluck('id'));
+        $captainRole->permissions()->sync($allPermissions->pluck('id'));
+        $superAdminRole->permissions()->sync($allPermissions->pluck('id')); // Legacy alias
 
         // Encoder permissions
         $encoderPermissions = Permission::whereIn('name', [
@@ -57,6 +74,18 @@ class RoleSeeder extends Seeder
             'view_analytics'
         ])->pluck('id');
         $encoderRole->permissions()->sync($encoderPermissions);
+
+        // Responder permissions (limited)
+        $responderPermissions = Permission::whereIn('name', [
+            'view_analytics'
+        ])->pluck('id');
+        $responderRole->permissions()->sync($responderPermissions);
+
+        // Evacuation Officer permissions (limited)
+        $evacuationOfficerPermissions = Permission::whereIn('name', [
+            'view_analytics'
+        ])->pluck('id');
+        $evacuationOfficerRole->permissions()->sync($evacuationOfficerPermissions);
 
         // Viewer permissions
         $viewerPermissions = Permission::whereIn('name', [
