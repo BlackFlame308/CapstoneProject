@@ -6,14 +6,14 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class CheckRole
+class CheckPermission
 {
     /**
      * Handle an incoming request.
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next, string $role): Response
+    public function handle(Request $request, Closure $next, string $permission): Response
     {
         if (!auth()->check()) {
             return response()->json([
@@ -24,19 +24,10 @@ class CheckRole
 
         $user = auth()->user();
 
-        if (!$user->role) {
+        if (!$user->hasPermission($permission)) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Forbidden: role assignment missing',
-            ], 403);
-        }
-
-        $allowedRoles = array_map('trim', explode('|', $role));
-
-        if (!in_array($user->role->name, $allowedRoles, true)) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Forbidden: insufficient role',
+                'message' => 'Forbidden: insufficient permission',
             ], 403);
         }
 
