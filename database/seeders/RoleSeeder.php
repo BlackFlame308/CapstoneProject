@@ -29,6 +29,7 @@ class RoleSeeder extends Seeder
         }
 
         // Create Roles
+        // Captain and Super Admin both represent super-admin access (for backward compatibility)
         $captainRole = Role::firstOrCreate(
             ['name' => 'Captain'],
             ['description' => 'Barangay Captain - super admin privileges', 'guard_name' => 'web']

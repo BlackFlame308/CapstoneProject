@@ -120,9 +120,6 @@
                         <a href="{{ route('households.index') }}" class="nav-link">
                             <i class="bi bi-house"></i> Households
                         </a>
-                        <a href="{{ route('responders.index') }}" class="nav-link">
-                            <i class="bi bi-people"></i> Responders
-                        </a>
                        
                         <a href="{{ route('analytics.index') }}" class="nav-link">
                             <i class="bi bi-graph-up"></i> Analytics

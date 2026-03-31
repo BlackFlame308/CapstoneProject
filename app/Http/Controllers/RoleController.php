@@ -57,15 +57,15 @@ class RoleController extends Controller
             abort(403, 'Unauthorized action.');
         }
         $permissions = Permission::all();
-        $rolePermissions = $role->permissions()->pluck('id')->toArray();
+        $rolePermissions = $role->permissions()->pluck('permissions.id')->toArray();
         return view('roles.edit', compact('role', 'permissions', 'rolePermissions'));
     }
 
     public function update(Request $request, Role $role)
     {
-        // Prevent editing Super Admin role (except by itself, and limited)
-        if ($role->name === 'Super Admin' && $request->user()->id !== auth()->id()) {
-            return back()->with('error', 'Cannot edit Super Admin role.');
+        // Captain is super admin and may manage roles, but core system roles should be protected.
+        if (in_array($role->name, ['Super Admin', 'Captain'])) {
+            return back()->with('error', 'Cannot edit core super admin role.');
         }
 
         $request->validate([
@@ -87,9 +87,9 @@ class RoleController extends Controller
 
     public function destroy(Request $request, Role $role)
     {
-        // Cannot delete Super Admin role
-        if ($role->name === 'Super Admin') {
-            return back()->with('error', 'Cannot delete Super Admin role.');
+        // Cannot delete Captain / Super Admin role, these are core privileged roles.
+        if (in_array($role->name, ['Super Admin', 'Captain'])) {
+            return back()->with('error', 'Cannot delete core super admin role.');
         }
 
         // Cannot delete role if users are assigned
