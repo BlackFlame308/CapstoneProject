@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Household;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -17,8 +19,14 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-            'role' => 'required|string|in:Captain,Encoder,Responder,Evacuation Officer',
+            'password' => 'nullable|string|min:8|confirmed',
+            'role' => 'required|string|in:Captain,Encoder,Responder,Evacuation Officer,Household',
+            'household' => 'sometimes|array',
+            'household.household_id' => 'sometimes|string|max:255',
+            'household.address' => 'sometimes|required_with:role|nullable|string|max:255',
+            'household.sitio' => 'sometimes|nullable|string|max:255',
+            'household.purok' => 'sometimes|nullable|string|max:255',
+            'household.emergency_contact' => 'sometimes|nullable|string|max:255',
         ]);
 
         if ($validator->fails()) {
@@ -29,15 +37,8 @@ class AuthController extends Controller
             ], 422);
         }
 
-        $roleLookup = [
-            'Captain' => 'Captain',
-            'Encoder' => 'Encoder',
-            'Responder' => 'Responder',
-            'Evacuation Officer' => 'Evacuation Officer',
-        ];
-
         $requestedRole = $request->input('role');
-        $role = Role::firstWhere('name', $roleLookup[$requestedRole] ?? '');
+        $role = Role::firstWhere('name', $requestedRole);
 
         if (!$role) {
             return response()->json([
@@ -48,43 +49,84 @@ class AuthController extends Controller
 
         $currentUser = auth()->user();
 
-        // Only Captain can create non-Captain users.
-        if ($requestedRole !== 'Captain') {
+        // If this is the very first account, allow creating Captain to bootstrap.
+        if (User::count() === 0) {
+            if ($requestedRole !== 'Captain') {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Forbidden: first account must be Captain.',
+                ], 403);
+            }
+        } else {
             if (!$currentUser || !$currentUser->isSuperAdmin()) {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Forbidden: only Captain can register users with this role.',
+                    'message' => 'Forbidden: only Captain can create accounts.',
+                ], 403);
+            }
+
+            // Prevent creating Super Admin legacy via API.
+            if ($requestedRole === 'Super Admin') {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Forbidden: cannot directly assign Super Admin role.',
                 ], 403);
             }
         }
 
-        // Only the first user or Captain can create Captain.
-        if ($requestedRole === 'Captain') {
-            if (User::count() > 0 && (!$currentUser || !$currentUser->isSuperAdmin())) {
+        $generatedPassword = null;
+        $rawPassword = $request->input('password');
+
+        if (!$rawPassword) {
+            $generatedPassword = Str::random(12);
+            $rawPassword = $generatedPassword;
+        }
+
+        $householdId = null;
+        if ($requestedRole === 'Household') {
+            $householdData = $request->input('household', []);
+            if (empty($householdData['address'])) {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Forbidden: only existing Captain can create another Captain.',
-                ], 403);
+                    'message' => 'Household details are required for Household accounts.',
+                ], 422);
             }
+
+            $household = Household::create([
+                'household_id' => $householdData['household_id'] ?? null,
+                'address' => $householdData['address'],
+                'sitio' => $householdData['sitio'] ?? null,
+                'purok' => $householdData['purok'] ?? null,
+                'emergency_contact' => $householdData['emergency_contact'] ?? null,
+            ]);
+
+            $householdId = $household->id;
         }
 
         $user = User::create([
             'name' => $request->input('name'),
             'email' => $request->input('email'),
-            'password' => Hash::make($request->input('password')),
+            'password' => Hash::make($rawPassword),
             'role_id' => $role->id,
+            'household_id' => $householdId,
         ]);
 
         $token = $user->createToken('api-token')->plainTextToken;
 
-        return response()->json([
+        $response = [
             'status' => 'success',
             'data' => [
                 'user' => $user,
                 'token' => $token,
             ],
             'message' => 'Registration successful',
-        ], 201);
+        ];
+
+        if ($generatedPassword) {
+            $response['data']['temporary_password'] = $generatedPassword;
+        }
+
+        return response()->json($response, 201);
     }
 
     public function login(Request $request): JsonResponse
@@ -130,6 +172,31 @@ class AuthController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Logged out successfully',
+        ], 200);
+    }
+
+    public function changePassword(Request $request): JsonResponse
+    {
+        $request->validate([
+            'current_password' => 'required|string',
+            'new_password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $user = $request->user();
+
+        if (!Hash::check($request->input('current_password'), $user->password)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Current password does not match.',
+            ], 403);
+        }
+
+        $user->password = Hash::make($request->input('new_password'));
+        $user->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Password changed successfully.',
         ], 200);
     }
 }

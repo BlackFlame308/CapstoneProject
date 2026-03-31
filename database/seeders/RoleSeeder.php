@@ -55,6 +55,11 @@ class RoleSeeder extends Seeder
             ['description' => 'Can only view data', 'guard_name' => 'web']
         );
 
+        $householdRole = Role::firstOrCreate(
+            ['name' => 'Household'],
+            ['description' => 'Household account with limited access to own profile', 'guard_name' => 'web']
+        );
+
         // Super admin alias support for old roles
         $superAdminRole = Role::firstOrCreate(
             ['name' => 'Super Admin'],
@@ -92,5 +97,11 @@ class RoleSeeder extends Seeder
             'view_analytics'
         ])->pluck('id');
         $viewerRole->permissions()->sync($viewerPermissions);
+
+        // Household permissions (read-only by default)
+        $householdPermissions = Permission::whereIn('name', [
+            'view_analytics'
+        ])->pluck('id');
+        $householdRole->permissions()->sync($householdPermissions);
     }
 }

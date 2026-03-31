@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Household;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -11,7 +12,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-#[Fillable(['name', 'email', 'password', 'role_id'])]
+#[Fillable(['name', 'email', 'password', 'role_id', 'household_id'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -36,6 +37,11 @@ class User extends Authenticatable
     public function hasPermission($permissionName)
     {
         return $this->role && $this->role->hasPermission($permissionName);
+    }
+
+    public function household()
+    {
+        return $this->belongsTo(Household::class);
     }
 
     public function isSuperAdmin()
