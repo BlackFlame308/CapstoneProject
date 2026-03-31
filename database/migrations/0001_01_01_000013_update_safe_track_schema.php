@@ -93,19 +93,7 @@ return new class extends Migration
         }
 
         // Align disaster events naming
-        if (Schema::hasTable('disaster_events')) {
-            Schema::table('disaster_events', function (Blueprint $table) {
-                if (!Schema::hasColumn('disaster_events', 'name')) {
-                    $table->string('name')->after('id');
-                }
-                if (!Schema::hasColumn('disaster_events', 'description')) {
-                    $table->text('description')->nullable()->after('name');
-                }
-                if (!Schema::hasColumn('disaster_events', 'date')) {
-                    $table->date('date')->nullable()->after('description');
-                }
-            });
-        }
+        // Removed - disaster events feature removed from system
 
         // Create reports table
         if (!Schema::hasTable('reports')) {
@@ -113,7 +101,6 @@ return new class extends Migration
                 $table->id();
                 $table->string('type');
                 $table->json('content');
-                $table->foreignId('disaster_event_id')->nullable()->constrained('disaster_events')->cascadeOnDelete();
                 $table->timestamps();
             });
         }
@@ -126,14 +113,6 @@ return new class extends Migration
     {
         if (Schema::hasTable('reports')) {
             Schema::dropIfExists('reports');
-        }
-
-        if (Schema::hasTable('disaster_events')) {
-            Schema::table('disaster_events', function (Blueprint $table) {
-                if (Schema::hasColumn('disaster_events', 'name')) {
-                    $table->dropColumn('name');
-                }
-            });
         }
 
         if (Schema::hasTable('members')) {

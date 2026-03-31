@@ -15,7 +15,6 @@ class UpdateReportRequest extends FormRequest
     {
         return [
             'type' => 'required|string|in:Evacuation Capacity,Disaster Event Summary,Sitio-Based Impact',
-            'disaster_event_id' => 'nullable|exists:disaster_events,id',
             'content' => 'required|array',
         ];
     }

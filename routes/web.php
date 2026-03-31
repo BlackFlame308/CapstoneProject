@@ -4,7 +4,6 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HouseholdController;
 use App\Http\Controllers\ResponderController;
 use App\Http\Controllers\AnalyticController;
-use App\Http\Controllers\DisasterEventController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
@@ -35,9 +34,6 @@ Route::middleware('auth')->group(function () {
     
     // Analytics
     Route::get('analytics', [AnalyticController::class, 'index'])->name('analytics.index');
-    
-    // Disaster events
-    Route::resource('disaster_events', DisasterEventController::class);
     
     // Super Admin only
     Route::middleware('is_super_admin')->group(function () {

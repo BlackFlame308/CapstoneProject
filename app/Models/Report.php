@@ -12,15 +12,9 @@ class Report extends Model
     protected $fillable = [
         'type',
         'content',
-        'disaster_event_id',
     ];
 
     protected $casts = [
         'content' => 'array',
     ];
-
-    public function disasterEvent()
-    {
-        return $this->belongsTo(DisasterEvent::class);
-    }
 }

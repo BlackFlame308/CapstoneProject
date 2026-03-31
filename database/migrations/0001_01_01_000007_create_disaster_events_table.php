@@ -1,30 +1,20 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * Disaster events feature has been removed from SafeTrack.
+     * This migration is kept for backwards compatibility but does nothing.
      */
     public function up(): void
     {
-        Schema::create('disaster_events', function (Blueprint $table) {
-            $table->id();
-            $table->string('disaster_type');
-            $table->date('date');
-            $table->text('description');
-            $table->timestamps();
-        });
+        // Disaster events feature removed
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('disaster_events');
+        // No-op
     }
 };

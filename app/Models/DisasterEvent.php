@@ -1,27 +1,5 @@
 <?php
 
-namespace App\Models;
-
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-
-class DisasterEvent extends Model
-{
-    use HasFactory;
-
-    protected $fillable = [
-        'name',
-        'disaster_type',
-        'date',
-        'description',
-    ];
-
-    protected $casts = [
-        'date' => 'date',
-    ];
-
-    public function reports()
-    {
-        return $this->hasMany(Report::class);
-    }
-}
+// DEPRECATED: DisasterEvent feature has been removed from SafeTrack
+// This file is kept for backwards compatibility and should be deleted
+// All disaster event functionality has been removed from the system

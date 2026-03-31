@@ -12,7 +12,7 @@ class ReportController extends Controller
 {
     public function index(): JsonResponse
     {
-        $reports = Report::with('disasterEvent')->paginate(20);
+        $reports = Report::paginate(20);
 
         return response()->json([
             'status' => 'success',
@@ -25,7 +25,6 @@ class ReportController extends Controller
     {
         $report = Report::create([
             'type' => $request->input('type'),
-            'disaster_event_id' => $request->input('disaster_event_id'),
             'content' => $request->input('content'),
         ]);
 
@@ -38,8 +37,6 @@ class ReportController extends Controller
 
     public function show(Report $report): JsonResponse
     {
-        $report->load('disasterEvent');
-
         return response()->json([
             'status' => 'success',
             'data' => $report,
@@ -51,7 +48,6 @@ class ReportController extends Controller
     {
         $report->update([
             'type' => $request->input('type'),
-            'disaster_event_id' => $request->input('disaster_event_id'),
             'content' => $request->input('content'),
         ]);
 

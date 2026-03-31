@@ -8,7 +8,6 @@ use App\Http\Controllers\API\MemberController;
 use App\Http\Controllers\API\AnalyticController;
 use App\Http\Controllers\API\ResponderController;
 use App\Http\Controllers\API\EvacuationOfficerController;
-use App\Http\Controllers\API\DisasterEventController;
 use App\Http\Controllers\API\ReportController;
 
 // Public routes
@@ -35,9 +34,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // Evacuation Officers
     Route::apiResource('evacuation-officers', EvacuationOfficerController::class);
-
-    // Disaster Events
-    Route::apiResource('disaster-events', DisasterEventController::class);
 
     // Reports
     Route::apiResource('reports', ReportController::class);
