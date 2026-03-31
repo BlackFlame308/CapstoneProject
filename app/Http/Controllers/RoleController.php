@@ -63,9 +63,9 @@ class RoleController extends Controller
 
     public function update(Request $request, Role $role)
     {
-        // Captain is super admin and may manage roles, but core system roles should be protected.
-        if (in_array($role->name, ['Super Admin', 'Captain'])) {
-            return back()->with('error', 'Cannot edit core super admin role.');
+        // Prevent editing Super Admin role directly, but allow Captain role updates.
+        if ($role->name === 'Super Admin') {
+            return back()->with('error', 'Cannot edit core Super Admin role.');
         }
 
         $request->validate([
