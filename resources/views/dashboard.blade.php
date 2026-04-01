@@ -178,6 +178,19 @@
                         </div>
                     </div>
 
+                    <!-- Upload CSV Shortcut -->
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <div class="card p-3">
+                                <h5>Quick Actions</h5>
+                                <p class="text-muted">Upload household CSV data directly from dashboard.</p>
+                                <a href="{{ route('households.upload') }}" class="btn btn-success">
+                                    <i class="bi bi-upload"></i> Upload Household CSV
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="row">
                         <div class="col-md-6">
                             <div class="card dashboard-card">

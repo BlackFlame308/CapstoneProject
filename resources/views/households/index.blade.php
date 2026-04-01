@@ -9,13 +9,18 @@
 <body>
     <div class="container mt-5">
         <h1>Households</h1>
-        <a href="{{ route('households.create') }}" class="btn btn-primary mb-3">Add Household</a>
+        <div class="mb-3">
+            <a href="{{ route('households.create') }}" class="btn btn-primary">Add Household</a>
+            <a href="{{ route('households.upload') }}" class="btn btn-secondary">Upload CSV</a>
+        </div>
         <table class="table table-striped">
             <thead>
                 <tr>
                     <th>ID</th>
+                    <th>Head of Household</th>
                     <th>Address</th>
                     <th>Purok</th>
+                    <th>Contact Number</th>
                     <th>Emergency Contact</th>
                     <th>Members</th>
                     <th>Actions</th>
@@ -25,8 +30,10 @@
                 @foreach($households as $household)
                 <tr>
                     <td>{{ $household->household_id }}</td>
+                    <td>{{ $household->headname }}</td>
                     <td>{{ $household->address }}</td>
                     <td>{{ $household->purok }}</td>
+                    <td>{{ $household->contact_number }}</td>
                     <td>{{ $household->emergency_contact }}</td>
                     <td>{{ $household->members->count() }}</td>
                     <td>

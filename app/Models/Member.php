@@ -11,6 +11,7 @@ class Member extends Model
 
     protected $fillable = [
         'household_id',
+        'philips_card_no',
         'first_name',
         'middle_name',
         'last_name',
@@ -20,13 +21,19 @@ class Member extends Model
         'sex',
         'civil_status',
         'religion',
+        'residence_address',
         'citizenship',
         'profession',
-        'contact_number',
-        'email',
         'education_level',
         'is_graduate',
         'is_pwd',
+        'contact_number',
+        'email',
+        'date_accomplished',
+        'name_signature',
+        'attested_by',
+        'left_thumbmark',
+        'right_thumbmark',
         'age',
     ];
 

@@ -12,9 +12,15 @@ class Household extends Model
     protected $fillable = [
         'household_id',
         'address',
-        'sitio',
         'purok',
+        'headname',
+        'contact_number',
         'emergency_contact',
+        'region',
+        'province',
+        'city_mun',
+        'barangay',
+        'household_number',
     ];
 
     public function members()

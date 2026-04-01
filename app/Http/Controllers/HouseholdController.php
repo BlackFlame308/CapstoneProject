@@ -4,12 +4,22 @@ namespace App\Http\Controllers;
 
 use App\Models\Household;
 use App\Models\Member;
+use App\Services\HouseholdCsvImportService;
 use Illuminate\Http\Request;
 
 class HouseholdController extends Controller
 {
     public function index()
     {
+        if (!auth()->user()->hasPermission('add_households') && !auth()->user()->hasPermission('update_households') && !auth()->user()->isSuperAdmin()) {
+            abort(403, 'Unauthorized to view households.');
+        }
+
+        // For Encoder role, redirect from dashboard entry to the create form directly.
+        if (auth()->user()->hasRole('Encoder') && !auth()->user()->isSuperAdmin()) {
+            return redirect()->route('households.create');
+        }
+
         $households = Household::with('members')->paginate(10);
         return view('households.index', compact('households'));
     }
@@ -33,23 +43,18 @@ class HouseholdController extends Controller
             'household_id' => 'required|unique:households',
             'address' => 'required',
             'purok' => 'required',
+            'region' => 'required',
+            'province' => 'required',
+            'city_mun' => 'required',
+            'barangay' => 'required',
+            'household_number' => 'required',
+            'headname' => 'required',
+            'contact_number' => 'required',
             'emergency_contact' => 'required',
-            'members' => 'array',
-            'members.*.name' => 'required',
-            'members.*.age' => 'required|integer',
-            'members.*.gender' => 'required|in:male,female,other',
-            'members.*.special_needs' => 'nullable|in:child,adult,senior,pwd',
         ]);
 
-        $household = Household::create($request->only(['household_id', 'address', 'purok', 'emergency_contact']));
+        $household = Household::create($request->only(['household_id', 'address', 'purok', 'region', 'province', 'city_mun', 'barangay', 'household_number', 'headname', 'contact_number', 'emergency_contact']));
 
-        if ($request->members) {
-            foreach ($request->members as $memberData) {
-                $household->members()->create($memberData);
-            }
-        }
-
-        // Update analytics
         $this->updateAnalytics();
 
         return redirect()->route('households.index')->with('success', 'Household created successfully.');
@@ -81,15 +86,22 @@ class HouseholdController extends Controller
             'household_id' => 'required|unique:households,household_id,' . $household->id,
             'address' => 'required',
             'purok' => 'required',
+            'region' => 'required',
+            'province' => 'required',
+            'city_mun' => 'required',
+            'barangay' => 'required',
+            'household_number' => 'required',
+            'headname' => 'required',
+            'contact_number' => 'required',
             'emergency_contact' => 'required',
             'members' => 'array',
-            'members.*.name' => 'required',
+            'members.*.first_name' => 'required',
+            'members.*.last_name' => 'required',
             'members.*.age' => 'required|integer',
-            'members.*.gender' => 'required|in:male,female,other',
-            'members.*.special_needs' => 'nullable|in:child,adult,senior,pwd',
+            'members.*.sex' => 'required|in:male,female,other',
         ]);
 
-        $household->update($request->only(['household_id', 'address', 'purok', 'emergency_contact']));
+        $household->update($request->only(['household_id', 'address', 'purok', 'region', 'province', 'city_mun', 'barangay', 'household_number', 'headname', 'contact_number', 'emergency_contact']));
 
 
         $household->members()->delete(); // Delete existing members
@@ -115,6 +127,30 @@ class HouseholdController extends Controller
         $household->delete();
         $this->updateAnalytics();
         return redirect()->route('households.index')->with('success', 'Household deleted successfully.');
+    }
+
+    public function uploadForm()
+    {
+        if (!auth()->user()->hasPermission('add_households') && !auth()->user()->isSuperAdmin()) {
+            abort(403, 'Unauthorized to upload households.');
+        }
+
+        return view('households.upload');
+    }
+
+    public function upload(Request $request, HouseholdCsvImportService $importService)
+    {
+        if (!auth()->user()->hasPermission('add_households') && !auth()->user()->isSuperAdmin()) {
+            abort(403, 'Unauthorized to upload households.');
+        }
+
+        $request->validate([
+            'file' => 'required|file|mimes:csv,txt',
+        ]);
+
+        $result = $importService->import($request->file('file')->getRealPath());
+
+        return redirect()->route('households.index')->with('success', 'Household CSV upload completed. ' . $result['success_count'] . ' rows imported.');
     }
 
     private function updateAnalytics()

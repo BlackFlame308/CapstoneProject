@@ -28,6 +28,8 @@ Route::middleware('auth')->group(function () {
     
     // Household management
     Route::resource('households', HouseholdController::class);
+    Route::get('households/upload', [HouseholdController::class, 'uploadForm'])->name('households.upload');
+    Route::post('households/upload', [HouseholdController::class, 'upload'])->name('households.upload.process');
     
     // Responders
     Route::resource('responders', ResponderController::class);
