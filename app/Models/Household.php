@@ -12,6 +12,7 @@ class Household extends Model
     protected $fillable = [
         'household_id',
         'address',
+        'sitio',
         'purok',
         'headname',
         'contact_number',
@@ -21,6 +22,13 @@ class Household extends Model
         'city_mun',
         'barangay',
         'household_number',
+    ];
+
+    protected $appends = [
+        'population',
+        'vulnerable_count',
+        'vulnerability_score',
+        'vulnerability_badge',
     ];
 
     public function members()
@@ -40,5 +48,37 @@ class Household extends Model
                 ->orWhere('age', '<=', 17)
                 ->orWhere('age', '>=', 60);
         })->count();
+    }
+
+    public function getVulnerabilityScoreAttribute()
+    {
+        return $this->members->reduce(function ($score, $member) {
+            if ($member->is_pwd) {
+                $score += 4;
+            }
+
+            if ($member->age >= 60) {
+                $score += 2;
+            }
+
+            if ($member->age < 18) {
+                $score += 1;
+            }
+
+            return $score;
+        }, 0);
+    }
+
+    public function getVulnerabilityBadgeAttribute()
+    {
+        if ($this->vulnerability_score > 7) {
+            return 'Critical';
+        }
+
+        if ($this->vulnerability_score > 4) {
+            return 'High';
+        }
+
+        return 'Moderate';
     }
 }

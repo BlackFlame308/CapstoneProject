@@ -11,6 +11,11 @@ class Member extends Model
 
     protected $fillable = [
         'household_id',
+        'name',
+        'age',
+        'gender',
+        'special_needs',
+        'is_pwd',
         'philips_card_no',
         'first_name',
         'middle_name',
@@ -26,7 +31,6 @@ class Member extends Model
         'profession',
         'education_level',
         'is_graduate',
-        'is_pwd',
         'contact_number',
         'email',
         'date_accomplished',
@@ -34,7 +38,6 @@ class Member extends Model
         'attested_by',
         'left_thumbmark',
         'right_thumbmark',
-        'age',
     ];
 
     protected $casts = [
@@ -56,6 +59,33 @@ class Member extends Model
             $this->last_name .
             ($this->suffix ? ' ' . $this->suffix : '')
         );
+    }
+
+    public function getIsSeniorAttribute()
+    {
+        return $this->age >= 60;
+    }
+
+    public function getIsChildAttribute()
+    {
+        return $this->age < 18;
+    }
+
+    public function getVulnerabilityTypeAttribute()
+    {
+        if ($this->is_pwd) {
+            return 'pwd';
+        }
+
+        if ($this->isSenior) {
+            return 'senior';
+        }
+
+        if ($this->isChild) {
+            return 'child';
+        }
+
+        return 'adult';
     }
 
     public function scopeSeniors($query)

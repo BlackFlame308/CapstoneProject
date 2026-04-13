@@ -24,17 +24,41 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
 
     // Household Management
-    Route::apiResource('households', HouseholdController::class);
+    Route::apiResource('households', HouseholdController::class)->names([
+        'index' => 'api.households.index',
+        'store' => 'api.households.store',
+        'show' => 'api.households.show',
+        'update' => 'api.households.update',
+        'destroy' => 'api.households.destroy'
+    ]);
     Route::post('households/upload-csv', [HouseholdController::class, 'uploadCsv']);
 
     // Member Management
-    Route::apiResource('members', MemberController::class);
+    Route::apiResource('members', MemberController::class)->names([
+        'index' => 'api.members.index',
+        'store' => 'api.members.store',
+        'show' => 'api.members.show',
+        'update' => 'api.members.update',
+        'destroy' => 'api.members.destroy'
+    ]);
 
     // Responders
-    Route::apiResource('responders', ResponderController::class);
+    Route::apiResource('responders', ResponderController::class)->names([
+        'index' => 'api.responders.index',
+        'store' => 'api.responders.store',
+        'show' => 'api.responders.show',
+        'update' => 'api.responders.update',
+        'destroy' => 'api.responders.destroy'
+    ]);
 
     // Evacuation Officers
-    Route::apiResource('evacuation-officers', EvacuationOfficerController::class);
+    Route::apiResource('evacuation-officers', EvacuationOfficerController::class)->names([
+        'index' => 'api.evacuation-officers.index',
+        'store' => 'api.evacuation-officers.store',
+        'show' => 'api.evacuation-officers.show',
+        'update' => 'api.evacuation-officers.update',
+        'destroy' => 'api.evacuation-officers.destroy'
+    ]);
 
     // Reports
     Route::apiResource('reports', ReportController::class);

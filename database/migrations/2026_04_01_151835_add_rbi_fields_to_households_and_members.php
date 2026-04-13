@@ -22,8 +22,7 @@ return new class extends Migration
         Schema::table('members', function (Blueprint $table) {
             $table->string('philips_card_no')->nullable()->after('last_name');
             $table->string('residence_address')->nullable()->after('religion');
-            $table->string('education_level')->nullable()->after('profession');
-            $table->string('date_accomplished')->nullable()->after('education_level');
+            $table->string('date_accomplished')->nullable()->after('profession');
             $table->string('name_signature')->nullable()->after('date_accomplished');
             $table->string('attested_by')->nullable()->after('name_signature');
             $table->boolean('left_thumbmark')->default(false)->after('attested_by');

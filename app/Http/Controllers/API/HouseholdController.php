@@ -36,8 +36,14 @@ class HouseholdController extends Controller
             $household = Household::create([
                 'household_id' => $request->input('household_id', $this->generateHouseholdId()),
                 'address' => $request->input('address'),
-                'sitio' => $request->input('sitio'),
                 'purok' => $request->input('purok'),
+                'region' => $request->input('region'),
+                'province' => $request->input('province'),
+                'city_mun' => $request->input('city_mun'),
+                'barangay' => $request->input('barangay'),
+                'household_number' => $request->input('household_number'),
+                'headname' => $request->input('headname'),
+                'contact_number' => $request->input('contact_number'),
                 'emergency_contact' => $request->input('emergency_contact'),
             ]);
 
@@ -73,7 +79,7 @@ class HouseholdController extends Controller
     public function update(UpdateHouseholdRequest $request, Household $household): JsonResponse
     {
         DB::transaction(function () use ($request, $household) {
-            $household->update($request->only(['address', 'sitio', 'purok', 'emergency_contact']));
+            $household->update($request->only(['address', 'purok', 'region', 'province', 'city_mun', 'barangay', 'household_number', 'headname', 'contact_number', 'emergency_contact']));
 
             if ($request->filled('members')) {
                 $household->members()->delete();

@@ -4,13 +4,10 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use App\Models\Role;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
     /**
      * Seed the application's database.
      */
@@ -19,9 +16,13 @@ class DatabaseSeeder extends Seeder
         // First, seed roles and permissions
         $this->call(RoleSeeder::class);
 
-        // Create a Super Admin (Captain) user
+        // Fetch roles
         $superAdminRole = Role::where('name', 'Super Admin')->first();
-        User::firstOrCreate(
+        $encoderRole = Role::where('name', 'Encoder')->first();
+        $viewerRole = Role::where('name', 'Viewer')->first();
+
+        // Create a Super Admin (Captain) user
+        $superAdmin = User::firstOrCreate(
             ['email' => 'captain@safetrack.local'],
             [
                 'name' => 'Barangay Captain',
@@ -31,8 +32,7 @@ class DatabaseSeeder extends Seeder
         );
 
         // Create an Encoder user
-        $encoderRole = Role::where('name', 'Encoder')->first();
-        User::firstOrCreate(
+        $encoder = User::firstOrCreate(
             ['email' => 'encoder@safetrack.local'],
             [
                 'name' => 'Data Encoder',
@@ -42,8 +42,7 @@ class DatabaseSeeder extends Seeder
         );
 
         // Create a Viewer user
-        $viewerRole = Role::where('name', 'Viewer')->first();
-        User::firstOrCreate(
+        $viewer = User::firstOrCreate(
             ['email' => 'viewer@safetrack.local'],
             [
                 'name' => 'System Viewer',
@@ -51,5 +50,15 @@ class DatabaseSeeder extends Seeder
                 'role_id' => $viewerRole->id,
             ]
         );
+
+        // Optional: Ensure roles are synced with permissions again just in case
+        $superAdminRole->permissions()->sync(\App\Models\Permission::all()->pluck('id'));
+        $encoderRole->permissions()->sync(\App\Models\Permission::whereIn('name', [
+            'add_households',
+            'update_households',
+            'view_households',
+            'manage_users',
+            'view_analytics'
+        ])->pluck('id'));
     }
 }

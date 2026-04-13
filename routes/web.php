@@ -26,10 +26,12 @@ Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->middl
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
-    // Household management
-    Route::resource('households', HouseholdController::class);
+    // Household management (static paths before resource so e.g. /households/upload is not matched as {household})
     Route::get('households/upload', [HouseholdController::class, 'uploadForm'])->name('households.upload');
     Route::post('households/upload', [HouseholdController::class, 'upload'])->name('households.upload.process');
+    Route::resource('households', HouseholdController::class);
+    Route::post('import',[HouseholdController::class,'import']);
+    Route::get('export',[HouseholdController::class,'export'])->name('households.export');
     
     // Responders
     Route::resource('responders', ResponderController::class);

@@ -18,6 +18,7 @@ class RoleSeeder extends Seeder
             ['name' => 'add_households', 'description' => 'Can add new households'],
             ['name' => 'update_households', 'description' => 'Can update household information'],
             ['name' => 'delete_households', 'description' => 'Can delete households'],
+            ['name' => 'view_households', 'description' => 'Can view households'], // <-- new
             ['name' => 'manage_users', 'description' => 'Can manage users'],
             ['name' => 'manage_responders', 'description' => 'Can manage responders'],
             ['name' => 'manage_evacuation_officers', 'description' => 'Can manage evacuation officers'],
@@ -25,11 +26,13 @@ class RoleSeeder extends Seeder
         ];
 
         foreach ($permissions as $permission) {
-            Permission::firstOrCreate(['name' => $permission['name']], ['description' => $permission['description'], 'guard_name' => 'web']);
+            Permission::firstOrCreate(
+                ['name' => $permission['name']],
+                ['description' => $permission['description'], 'guard_name' => 'web']
+            );
         }
 
         // Create Roles
-        // Captain and Super Admin both represent super-admin access (for backward compatibility)
         $captainRole = Role::firstOrCreate(
             ['name' => 'Captain'],
             ['description' => 'Barangay Captain - super admin privileges', 'guard_name' => 'web']
@@ -60,7 +63,7 @@ class RoleSeeder extends Seeder
             ['description' => 'Household account with limited access to own profile', 'guard_name' => 'web']
         );
 
-        // Super admin alias support for old roles
+        // Legacy Super Admin
         $superAdminRole = Role::firstOrCreate(
             ['name' => 'Super Admin'],
             ['description' => 'Legacy Super Admin alias', 'guard_name' => 'web']
@@ -68,25 +71,28 @@ class RoleSeeder extends Seeder
 
         // Assign permissions to roles
         $allPermissions = Permission::all();
-        $captainRole->permissions()->sync($allPermissions->pluck('id'));
-        $superAdminRole->permissions()->sync($allPermissions->pluck('id')); // Legacy alias
 
-        // Encoder permissions
+        // Captain and Super Admin get all permissions
+        $captainRole->permissions()->sync($allPermissions->pluck('id'));
+        $superAdminRole->permissions()->sync($allPermissions->pluck('id'));
+
+        // Encoder permissions (include view_households)
         $encoderPermissions = Permission::whereIn('name', [
             'add_households',
             'update_households',
+            'view_households',
             'manage_users',
             'view_analytics'
         ])->pluck('id');
         $encoderRole->permissions()->sync($encoderPermissions);
 
-        // Responder permissions (limited)
+        // Responder permissions
         $responderPermissions = Permission::whereIn('name', [
             'view_analytics'
         ])->pluck('id');
         $responderRole->permissions()->sync($responderPermissions);
 
-        // Evacuation Officer permissions (limited)
+        // Evacuation Officer permissions
         $evacuationOfficerPermissions = Permission::whereIn('name', [
             'view_analytics'
         ])->pluck('id');

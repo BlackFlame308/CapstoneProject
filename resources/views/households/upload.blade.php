@@ -1,14 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload Households</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-    <div class="container mt-5">
-        <h1>Upload Households CSV</h1>
+@extends('layouts.app')
+
+@section('title', 'Upload Households - SafeTrack')
+
+@section('content')
+    <div class="mb-4">
+        <h1 class="h3">Upload Households CSV</h1>
+    </div>
         
         <div class="alert alert-info">
             <h5>CSV Format Required</h5>
@@ -88,7 +85,4 @@ HH-001,123 Main St,Sitio A,Region IV-A,Province X,City Y,Barangay Z,HH-001,Rex M
             <li>Members can be added separately after household creation</li>
         </ul>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+@endsection

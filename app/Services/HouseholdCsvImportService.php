@@ -133,7 +133,6 @@ class HouseholdCsvImportService
                         'left_thumbmark' => filter_var($row['left_thumbmark'] ?? false, FILTER_VALIDATE_BOOLEAN),
                         'right_thumbmark' => filter_var($row['right_thumbmark'] ?? false, FILTER_VALIDATE_BOOLEAN),
                         'age' => $row['age'],
-                        'gender' => $row['sex'],
                     ]);
 
                     $successCount++;
